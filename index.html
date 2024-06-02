@@ -11,22 +11,64 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
         }
-        video {
-            width: 80%;
-            max-width: 800px;
-            height: auto;
-            display: block;
+        h1 {
+            margin-bottom: 20px;
+        }
+        .video-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .video-link {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .video-link:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <video controls>
-        <source src="https://raw.githubusercontent.com/ChaficH/Video/main/tv.m3u8" type="application/x-mpegURL">
+    <h1>Choose a Video</h1>
+    <div class="video-links" id="video-links"></div>
+    <video controls id="video-player">
         Your browser does not support the video tag.
     </video>
+
+    <script>
+        // Function to load video from selected link
+        function loadVideo(videoUrl) {
+            const videoPlayer = document.getElementById('video-player');
+            videoPlayer.src = videoUrl;
+            videoPlayer.load();
+            videoPlayer.play();
+        }
+
+        // Fetch the M3U8 file and extract video links
+        fetch('https://raw.githubusercontent.com/ChaficH/Video/main/tv.m3u8')
+            .then(response => response.text())
+            .then(data => {
+                const videoLinksContainer = document.getElementById('video-links');
+                const videoUrls = data.split('\n').filter(line => line.trim() !== '' && !line.startsWith('#'));
+                videoUrls.forEach((videoUrl, index) => {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.classList.add('video-link');
+                    link.textContent = `Video ${index + 1}`;
+                    link.addEventListener('click', () => loadVideo(videoUrl));
+                    videoLinksContainer.appendChild(link);
+                });
+            })
+            .catch(error => console.error('Error fetching M3U8 file:', error));
+    </script>
 </body>
 </html>
